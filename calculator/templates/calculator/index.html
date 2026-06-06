@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Django Calculator</title>
+    <link rel="stylesheet" href="{% static 'calculator/css/styles.css' %}" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="header">
+        <h1>Django Calculator</h1>
+        <p>Basic arithmetic powered by Django</p>
+      </header>
+
+      <main class="calculator">
+        <div class="display-wrap">
+          <div id="expression" class="expression">&nbsp;</div>
+          <div id="result" class="result">0</div>
+        </div>
+
+        <div class="keypad">
+          <button class="btn btn-danger" data-action="clear" type="button">AC</button>
+          <button class="btn btn-danger" data-action="backspace" type="button">⌫</button>
+          <button class="btn btn-operator" data-action="append" data-value="%" type="button">%</button>
+          <button class="btn btn-operator" data-action="append" data-value="/" type="button">÷</button>
+
+          <button class="btn" data-action="append" data-value="7" type="button">7</button>
+          <button class="btn" data-action="append" data-value="8" type="button">8</button>
+          <button class="btn" data-action="append" data-value="9" type="button">9</button>
+          <button class="btn btn-operator" data-action="append" data-value="*" type="button">×</button>
+
+          <button class="btn" data-action="append" data-value="4" type="button">4</button>
+          <button class="btn" data-action="append" data-value="5" type="button">5</button>
+          <button class="btn" data-action="append" data-value="6" type="button">6</button>
+          <button class="btn btn-operator" data-action="append" data-value="-" type="button">−</button>
+
+          <button class="btn" data-action="append" data-value="1" type="button">1</button>
+          <button class="btn" data-action="append" data-value="2" type="button">2</button>
+          <button class="btn" data-action="append" data-value="3" type="button">3</button>
+          <button class="btn btn-operator" data-action="append" data-value="+" type="button">+</button>
+
+          <button class="btn btn-wide" data-action="append" data-value="0" type="button">0</button>
+          <button class="btn" data-action="append" data-value="." type="button">.</button>
+          <button class="btn btn-equals" data-action="equals" type="button">=</button>
+        </div>
+
+        <footer class="footer">
+          <span class="status">
+            <span id="status-dot" class="status-dot"></span>
+            <span id="status-text">Ready</span>
+          </span>
+        </footer>
+      </main>
+    </div>
+
+    {% csrf_token %}
+    <script src="{% static 'calculator/js/calculator.js' %}"></script>
+  </body>
+</html>
