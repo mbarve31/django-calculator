@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Screen Agent</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/monokai-sublime.min.css"
+    />
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <h1>Screen Agent</h1>
+          <p>Share your screen, capture a frame, get answers in the panel.</p>
+          <p class="browser-note">Open this page in Chrome or Safari — Cursor’s built-in browser cannot share the screen.</p>
+        </div>
+        <div id="status-pill" class="status-pill status-idle">Checking…</div>
+      </header>
+
+      <div id="browser-warning" class="browser-warning hidden" role="alert"></div>
+
+      <section class="controls card">
+        <div class="control-row">
+          <label for="mode">Mode</label>
+          <select id="mode">
+            <option value="coding">Coding question (Codility, LeetCode, …)</option>
+            <option value="system_design">System design (principal-level)</option>
+            <option value="ai_assessment">AI assessment / prompt task</option>
+            <option value="general">General Q&amp;A</option>
+          </select>
+        </div>
+
+        <div class="control-row">
+          <label for="context">Extra context (optional)</label>
+          <textarea
+            id="context"
+            rows="2"
+            placeholder="e.g. 100M DAU, must be multi-region, strong consistency required"
+          ></textarea>
+        </div>
+
+        <div class="button-row">
+          <button id="share-btn" class="btn btn-primary" type="button">
+            Start screen share
+          </button>
+          <button id="capture-btn" class="btn btn-secondary" type="button" disabled>
+            Analyze current frame
+          </button>
+          <label class="toggle">
+            <input id="auto-analyze" type="checkbox" />
+            Auto-analyze every
+            <select id="auto-interval" disabled>
+              <option value="15">15s</option>
+              <option value="30" selected>30s</option>
+              <option value="60">60s</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <main class="workspace">
+        <section class="card preview-panel">
+          <div class="panel-header">
+            <h2>Screen preview</h2>
+            <span id="share-state" class="muted">Not sharing</span>
+          </div>
+          <div class="preview-wrap">
+            <video id="preview" autoplay muted playsinline></video>
+            <canvas id="capture-canvas" hidden></canvas>
+            <div id="preview-empty" class="preview-empty">
+              Click “Start screen share” and pick the window or tab with your
+              assessment.
+            </div>
+          </div>
+        </section>
+
+        <div class="side-stack">
+        <section class="card results-panel">
+          <div class="panel-header">
+            <h2>Agent response</h2>
+            <button id="clear-history" class="btn btn-ghost" type="button">
+              Clear
+            </button>
+          </div>
+          <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <span>Reading screen and thinking…</span>
+          </div>
+          <div id="results" class="results">
+            <p class="muted placeholder">
+              Capture a frame to see structured answers here — code solutions,
+              recommended prompts, or direct Q&amp;A.
+            </p>
+          </div>
+        </section>
+
+        <section class="card chat-panel">
+          <div class="panel-header">
+            <h2>Chat</h2>
+            <button id="clear-chat" class="btn btn-ghost" type="button">Clear</button>
+          </div>
+          <div id="chat-messages" class="chat-messages">
+            <p class="muted placeholder">
+              Ask follow-ups — explain the approach, optimize code, or clarify the task.
+            </p>
+          </div>
+          <div id="chat-loading" class="loading hidden">
+            <div class="spinner"></div>
+            <span>Thinking…</span>
+          </div>
+          <div class="chat-compose">
+            <label class="toggle chat-toggle">
+              <input id="chat-include-screen" type="checkbox" />
+              Include current screen frame
+            </label>
+            <div class="chat-input-row">
+              <textarea
+                id="chat-input"
+                rows="2"
+                placeholder="e.g. What if we need strong consistency? Redesign for 10M QPS"
+              ></textarea>
+              <button id="chat-send" class="btn btn-primary" type="button">Send</button>
+            </div>
+          </div>
+        </section>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/rust.min.js"></script>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
