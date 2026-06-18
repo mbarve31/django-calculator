@@ -17,9 +17,13 @@
   const chatMessages = document.getElementById("chat-messages");
   const chatInput = document.getElementById("chat-input");
   const chatSendBtn = document.getElementById("chat-send");
+  const chatDictateBtn = document.getElementById("chat-dictate");
   const chatLoading = document.getElementById("chat-loading");
   const chatIncludeScreen = document.getElementById("chat-include-screen");
   const clearChatBtn = document.getElementById("clear-chat");
+
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
 
   let mediaStream = null;
   let autoTimer = null;
@@ -28,6 +32,10 @@
   let healthReady = false;
   let lastAnalysisContext = "";
   let chatHistory = [];
+  let speechRecognition = null;
+  let dictationListening = false;
+  let dictationBase = "";
+  let dictationFinalized = "";
 
   function setStatus(kind, text) {
     statusPill.className = `status-pill status-${kind}`;
@@ -667,7 +675,120 @@
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
+  function updateDictationInput(interim = "") {
+    chatInput.value = dictationBase + dictationFinalized + interim;
+  }
+
+  function setDictationListening(listening) {
+    dictationListening = listening;
+    chatDictateBtn.classList.toggle("dictate-listening", listening);
+    chatDictateBtn.setAttribute("aria-pressed", listening ? "true" : "false");
+    chatDictateBtn.title = listening ? "Stop listening" : "Dictate message";
+    chatDictateBtn.setAttribute(
+      "aria-label",
+      listening ? "Stop listening" : "Dictate message"
+    );
+  }
+
+  function stopDictation() {
+    if (!dictationListening && !speechRecognition) return;
+
+    setDictationListening(false);
+    if (speechRecognition) {
+      speechRecognition.onend = null;
+      try {
+        speechRecognition.stop();
+      } catch {
+        /* already stopped */
+      }
+      speechRecognition.onend = handleDictationEnd;
+    }
+  }
+
+  function handleDictationEnd() {
+    if (!dictationListening) return;
+
+    try {
+      speechRecognition.start();
+    } catch {
+      setDictationListening(false);
+    }
+  }
+
+  function startDictation() {
+    if (!speechRecognition) return;
+
+    dictationBase = chatInput.value;
+    if (dictationBase && !/\s$/.test(dictationBase)) {
+      dictationBase += " ";
+    }
+    dictationFinalized = "";
+    setDictationListening(true);
+
+    try {
+      speechRecognition.start();
+    } catch {
+      setDictationListening(false);
+    }
+  }
+
+  function toggleDictation() {
+    if (!speechRecognition || chatDictateBtn.disabled) return;
+
+    if (dictationListening) {
+      stopDictation();
+    } else {
+      startDictation();
+    }
+  }
+
+  function initDictation() {
+    if (!SpeechRecognition) {
+      chatDictateBtn.disabled = true;
+      chatDictateBtn.title =
+        "Speech recognition is not supported in this browser. Use Chrome or Safari.";
+      chatDictateBtn.setAttribute(
+        "aria-label",
+        "Dictate unavailable — use Chrome or Safari"
+      );
+      return;
+    }
+
+    speechRecognition = new SpeechRecognition();
+    speechRecognition.continuous = true;
+    speechRecognition.interimResults = true;
+    speechRecognition.lang = navigator.language || "en-US";
+
+    speechRecognition.onresult = (event) => {
+      let interim = "";
+      for (let i = event.resultIndex; i < event.results.length; i += 1) {
+        const result = event.results[i];
+        const transcript = result[0].transcript;
+        if (result.isFinal) {
+          dictationFinalized += transcript;
+        } else {
+          interim += transcript;
+        }
+      }
+      updateDictationInput(interim);
+    };
+
+    speechRecognition.onerror = (event) => {
+      if (event.error === "not-allowed") {
+        chatDictateBtn.title =
+          "Microphone access denied — allow mic permission in browser settings.";
+      } else if (event.error !== "aborted" && event.error !== "no-speech") {
+        chatDictateBtn.title = `Dictation error: ${event.error}`;
+      }
+      stopDictation();
+    };
+
+    speechRecognition.onend = handleDictationEnd;
+  }
+
   async function sendChatMessage() {
+    stopDictation();
+
     const text = chatInput.value.trim();
     if (!text || chatting) return;
 
@@ -805,6 +926,7 @@
   });
 
   chatSendBtn.addEventListener("click", sendChatMessage);
+  chatDictateBtn.addEventListener("click", toggleDictation);
   chatInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
@@ -848,6 +970,7 @@
   }
 
   updateContextPlaceholder();
+  initDictation();
   checkScreenCapture();
   checkHealth();
 })();

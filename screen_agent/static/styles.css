@@ -454,7 +454,7 @@ textarea {
 
 .chat-input-row {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr auto auto;
   gap: 10px;
   align-items: end;
 }
@@ -462,6 +462,37 @@ textarea {
 .chat-input-row textarea {
   resize: vertical;
   min-height: 56px;
+}
+
+.chat-dictate-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  padding: 10px 12px;
+}
+
+.chat-dictate-btn .mic-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.chat-dictate-btn.dictate-listening {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.45);
+  color: var(--danger);
+  animation: dictate-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes dictate-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.35);
+  }
+
+  50% {
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+  }
 }
 
 .api-table,
